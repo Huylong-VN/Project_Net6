@@ -1,4 +1,6 @@
-﻿namespace CRM_Management_Student.Backend.ViewModels.Users
+﻿using CRM_Management_Student.Backend.ViewModels.Common;
+
+namespace CRM_Management_Student.Backend.ViewModels.Users
 {
     public class UpdateUserDto
     {

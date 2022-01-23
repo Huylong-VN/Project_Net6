@@ -8,7 +8,7 @@ namespace CRM_Management_Student.Backend.Data.Entity
         public string? Image { set; get; }
         public bool? Status { set; get; } = false;
         public List<AppUserRole>? AppUserRoles { get; set; }
-        public List<UserSubject>? UserSubjects { get; set; }
         public List<UserClass>? UserClasses { get; set; }
+        public List<Message>? Messages { get; set; }
     }
 }

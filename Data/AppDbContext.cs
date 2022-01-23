@@ -12,15 +12,25 @@ namespace CRM_Management_Student.Backend.Data
         }
         protected override void OnModelCreating(ModelBuilder builder)
         {
+            builder.Entity<Message>(x =>
+            {
+                x.ToTable("Messages");
+                x.HasKey(x => x.Id);
+                x.HasOne(x => x.AppUser).WithMany(x => x.Messages).HasForeignKey(x => x.UserId);
+            });
             builder.Entity<UserClass>(x =>
             {
                 x.ToTable("UserClasses");
                 x.HasKey(x => new { x.UserId, x.ClassId });
+                x.HasOne(x => x.AppUser).WithMany(x => x.UserClasses).HasForeignKey(x => x.UserId);
+                x.HasOne(x => x.Class).WithMany(x => x.UserClasses).HasForeignKey(x => x.ClassId);
             });
-            builder.Entity<UserSubject>(x =>
+            builder.Entity<ClassSubject>(x =>
             {
-                x.ToTable("UserSubjects");
-                x.HasKey(x => new { x.UserId, x.SubjectId });
+                x.ToTable("SubjectClasses");
+                x.HasKey(x => new { x.ClassId, x.SubjectId });
+                x.HasOne(x => x.Class).WithMany(x => x.SubjectClasses).HasForeignKey(x => x.ClassId);
+                x.HasOne(x => x.Subject).WithMany(x => x.SubjectClasses).HasForeignKey(x => x.ClassId);
             });
             builder.Entity<Class>(x =>
             {
@@ -55,6 +65,13 @@ namespace CRM_Management_Student.Backend.Data
                 Name = "admin",
                 NormalizedName = "admin",
             });
+            builder.Entity<AppRole>().HasData(new AppRole()
+            {
+                Id = new Guid("5e54e16d-681f-4388-bf83-5cc4a57c29cd"),
+                Name = "student",
+                NormalizedName = "student",
+            });
+
             builder.Entity<AppUserRole>().HasData(new AppUserRole()
             {
                 RoleId = new Guid("cc88ab6f-5d66-4c30-a60e-8f5254f1e112"),
@@ -81,7 +98,8 @@ namespace CRM_Management_Student.Backend.Data
         public DbSet<Subject> Subjects { get; set; }
         public DbSet<Class> Classes { get; set; }
         public DbSet<UserClass> UserClasses { get; set; }
-        public DbSet<UserSubject> UserSubjects { get; set; }
+        public DbSet<ClassSubject> UserSubjects { get; set; }
+        public DbSet<Message> Messages { get; set; }
 
     }
 }

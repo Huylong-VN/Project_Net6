@@ -2381,11 +2381,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "E:\\BackendNet6\\CRM_Management_Student.Backend\\CRM_Management_Student.Backend.csproj",
+      "projectUniqueName": "D:\\CRM_Management_Student.Backend\\CRM_Management_Student.Backend.csproj",
       "projectName": "CRM_Management_Student.Backend",
-      "projectPath": "E:\\BackendNet6\\CRM_Management_Student.Backend\\CRM_Management_Student.Backend.csproj",
+      "projectPath": "D:\\CRM_Management_Student.Backend\\CRM_Management_Student.Backend.csproj",
       "packagesPath": "C:\\Users\\huylo\\.nuget\\packages\\",
-      "outputPath": "E:\\BackendNet6\\CRM_Management_Student.Backend\\obj\\",
+      "outputPath": "D:\\CRM_Management_Student.Backend\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\huylo\\AppData\\Roaming\\NuGet\\NuGet.Config",

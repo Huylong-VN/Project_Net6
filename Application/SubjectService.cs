@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CRM_Management_Student.Backend.Data;
+using CRM_Management_Student.Backend.Data.Entity;
 using CRM_Management_Student.Backend.ViewModels.Classes;
 using CRM_Management_Student.Backend.ViewModels.Common;
 using CRM_Management_Student.Backend.ViewModels.Subjects;
@@ -15,6 +16,7 @@ namespace CRM_Management_Student.Backend.Application
         Task<ApiResult<SubjectVm>> CreateAsync(SubjectCreate request);
         Task<ApiResult<bool>> DeleteAsync(Guid Id);
         Task<ApiResult<SubjectVm>> GetClassById(Guid Id);
+        Task<ApiResult<SubjectVm>> UpdateAsync(Guid Id, SubjectUpdate request);
     }
     public class SubjectService : ISubjectService
     {
@@ -25,9 +27,10 @@ namespace CRM_Management_Student.Backend.Application
             _mapper = mapper;
             _appDbContext = appDbContext;
         }
-        public Task<ApiResult<SubjectVm>> CreateAsync(SubjectCreate request)
+        public async Task<ApiResult<SubjectVm>> CreateAsync(SubjectCreate request)
         {
-            throw new NotImplementedException();
+            var result = await _appDbContext.Subjects.AddAsync(_mapper.Map<Subject>(request));
+            return new ApiSuccessResult<SubjectVm>(_mapper.Map<SubjectVm>(result));
         }
 
         public async Task<ApiResult<bool>> DeleteAsync(Guid Id)
@@ -44,8 +47,8 @@ namespace CRM_Management_Student.Backend.Application
 
         public async Task<PagedResultDto<SubjectVm>> GetListAsync(PagedAndSortedResultRequestDto request)
         {
-            var query = _appDbContext.Subjects.Include(x => x.UserSubjects)
-                                                     .ThenInclude(x => x.AppUser)
+            var query = _appDbContext.Subjects.Include(x => x.SubjectClasses)
+                                                     .ThenInclude(x => x.Class)
                                                      .AsQueryable();
             if (!string.IsNullOrWhiteSpace(request.Filter))
             {
@@ -71,6 +74,18 @@ namespace CRM_Management_Student.Backend.Application
                 return new ApiSuccessResult<SubjectVm>(_mapper.Map<SubjectVm>(@class));
             }
             return new ApiErrorResult<SubjectVm>("Can't find class");
+        }
+
+        public async Task<ApiResult<SubjectVm>> UpdateAsync(Guid Id, SubjectUpdate request)
+        {
+            var subject = await _appDbContext.Subjects.FindAsync(Id);
+            if (subject == null) return new ApiErrorResult<SubjectVm>("Can't find subject");
+            if (request.Description != null) subject.Description = request.Description;
+            if (request.Name != null) subject.Name = request.Name;
+            subject.UserModified = request.UserModified;
+            _appDbContext.Subjects.Update(subject);
+            await _appDbContext.SaveChangesAsync();
+            return new ApiSuccessResult<SubjectVm>(_mapper.Map<SubjectVm>(subject));
         }
     }
 }

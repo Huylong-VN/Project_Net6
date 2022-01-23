@@ -36,8 +36,6 @@ namespace CRM_Management_Student.Backend.Application
 
         Task<ApiResult<bool>> LookUser(Guid Id);
 
-        Task<ApiResult<bool>> AssignClass(Guid Id, Guid ClassId);
-
 
 
     }
@@ -84,7 +82,6 @@ namespace CRM_Management_Student.Backend.Application
             if (user == null) return new ApiErrorResult<UserAuthenticate>("Can't find user in system");
             var result = await _signInManager.PasswordSignInAsync(user, request.Password, true, true);
             if (!result.Succeeded) return new ApiErrorResult<UserAuthenticate>("Password Wrong");
-            if (user.LockoutEnabled) return new ApiErrorResult<UserAuthenticate>("User is looked out");
             var roles = await _userManager.GetRolesAsync(user);
             return new ApiSuccessResult<UserAuthenticate>(new UserAuthenticate
             {
@@ -96,7 +93,6 @@ namespace CRM_Management_Student.Backend.Application
                 UserName = user.UserName,
                 Roles = roles,
                 Image=user.Image,
-                
             }
             );
         }
@@ -134,6 +130,10 @@ namespace CRM_Management_Student.Backend.Application
         {
             var user = await _userManager.FindByIdAsync(Id.ToString());
             if (user == null) return false;
+            if (user.Image != null)
+            {
+                await _storageService.DeleteFileAsync(user.Image);
+            }
             var result = await _userManager.DeleteAsync(user);
             return result.Succeeded;
         }
@@ -145,35 +145,31 @@ namespace CRM_Management_Student.Backend.Application
 
             if (!string.IsNullOrWhiteSpace(request.Filter))
             {
-                query=query.Where(x => x.UserName.Contains(request.Filter) ||x.FullName.Contains(request.Filter)|| x.Email.Contains(request.Filter));
+                query=query.Where(x => x.UserName.Contains(request.Filter)|| x.FullName.Contains(request.Filter)|| x.Email.Contains(request.Filter) || x.AppUserRoles.Any(r=>r.AppRole.Name.Equals(request.Filter)));
             }
             if (string.IsNullOrEmpty(request.Sorting)) request.Sorting = nameof(AppUser.UserName);
             if (request.SkipCount == 0) request.SkipCount = 1;
             if (request.MaxResultCount == 0) request.MaxResultCount = 10;
             var t = await query.OrderBy(x => x.Id).Skip((request.SkipCount - 1) * request.MaxResultCount).
                 Take(request.MaxResultCount).ToListAsync();
-            var user = t.Select(x => new UserVm()
-            {
-                FullName = x.FullName,
-                Email = x.Email,
-                Id = x.Id,
-                PhoneNumber = x.PhoneNumber,
-                UserName = x.UserName,
-                Image=x.Image,
-                Status= x.Status,
-            }).ToList();
-            return new PagedResultDto<UserVm> { Items = user, TotalCount = query.Count() };
+            return new PagedResultDto<UserVm> { Items = _mapper.Map<List<UserVm>>(t), TotalCount = query.Count() };
         }
 
         public async Task<ApiResult<UserVm>> UpdateAsync(Guid Id, UpdateUserDto request)
         {
             var user = await _userManager.FindByIdAsync(Id.ToString());
             if (user == null) return new ApiErrorResult<UserVm>("Can't find this account");
+            if (user.Image != null)
+            {
+                await _storageService.DeleteFileAsync(user.Image);
+            }
             if (request.FullName != null) user.FullName = request.FullName;
             if (request.Email != null) user.Email = request.Email;
             if (request.PhoneNumber!=null) user.PhoneNumber = request.PhoneNumber;
             if (request.Image != null) user.Image = await SaveFile(request.Image);
+
             await _userManager.UpdateAsync(user);
+
             return new ApiSuccessResult<UserVm>(_mapper.Map<UserVm>(user));
         }
 
@@ -276,9 +272,5 @@ namespace CRM_Management_Student.Backend.Application
             return new ApiErrorResult<bool>();
         }
 
-        public Task<ApiResult<bool>> AssignClass(Guid Id, Guid ClassId)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

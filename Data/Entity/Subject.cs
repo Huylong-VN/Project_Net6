@@ -4,6 +4,6 @@
     {
         public string? Name { set;get; }
         public string? Description { set;get; }
-        public List<UserSubject>? UserSubjects { get; set; }
+        public List<ClassSubject>? SubjectClasses { get; set; }
     }
 }

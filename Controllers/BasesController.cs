@@ -6,7 +6,6 @@ namespace CRM_Management_Student.Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class BasesController : ControllerBase
     {
     }

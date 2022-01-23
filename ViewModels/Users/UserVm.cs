@@ -9,6 +9,6 @@
         public string? Email { set; get; }
         public bool? Status { set; get; }
         public string? PhoneNumber { set; get; }
-        public RoleVm AppRole { set; get; }
+        public List<RoleVm> AppRole { set; get; }
     }
 }

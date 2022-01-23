@@ -7,6 +7,7 @@ namespace CRM_Management_Student.Backend.ViewModels.Classes
     {
         public string? Name { get; set; }
         public string? Description { get; set; }
-        public UserVm? AppUser { set; get; }
+        public string? Image { set; get; }
+        public List<UserVm>? AppUser { set; get; }
     }
 }

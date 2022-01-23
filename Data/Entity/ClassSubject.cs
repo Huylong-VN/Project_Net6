@@ -1,9 +1,9 @@
 ﻿namespace CRM_Management_Student.Backend.Data.Entity
 {
-    public class UserSubject
+    public class ClassSubject
     {
-        public AppUser? AppUser { get; set; }
-        public Guid UserId { set; get; }
+        public Class? Class { get; set; }
+        public Guid ClassId { set; get; }
         public Subject? Subject { get; set; }
         public Guid SubjectId { set; get; }
 

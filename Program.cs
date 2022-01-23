@@ -29,9 +29,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
               options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 builder.Services.AddIdentity<AppUser, AppRole>(opt =>
 {
-    opt.Lockout.AllowedForNewUsers = true;
-    opt.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(2);
-   opt.Lockout.MaxFailedAccessAttempts = 3;
+   // opt.Lockout.AllowedForNewUsers = true;
+   // opt.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(2);
+   //opt.Lockout.MaxFailedAccessAttempts = 3;
 }).AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
 
 builder.Services.AddAuthentication(options =>

@@ -45,9 +45,16 @@ namespace CRM_Management_Student.Backend.Migrations
                         new
                         {
                             Id = new Guid("cc88ab6f-5d66-4c30-a60e-8f5254f1e112"),
-                            ConcurrencyStamp = "de5fe0a7-8c86-48c2-bb32-0070204c4b9e",
+                            ConcurrencyStamp = "154aa0b6-0d8d-435b-b12e-c7028fe0556d",
                             Name = "admin",
                             NormalizedName = "admin"
+                        },
+                        new
+                        {
+                            Id = new Guid("5e54e16d-681f-4388-bf83-5cc4a57c29cd"),
+                            ConcurrencyStamp = "794f31b2-007c-4c64-8962-2ae355f3fab5",
+                            Name = "student",
+                            NormalizedName = "student"
                         });
                 });
 
@@ -117,14 +124,14 @@ namespace CRM_Management_Student.Backend.Migrations
                         {
                             Id = new Guid("0027068e-4c5d-4ecb-a157-b9cc063cd672"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "9879b9a0-ee5f-4a4f-8788-cfc938b5b27e",
+                            ConcurrencyStamp = "42374f1e-30c0-4661-ad52-f35ba55a689c",
                             Email = "huynabhaf190133@fpt.edu.vn",
                             EmailConfirmed = true,
                             FullName = "Nguyen Anh Huy",
                             LockoutEnabled = false,
                             NormalizedEmail = "huynabhaf190133@fpt.edu.vn",
                             NormalizedUserName = "admin",
-                            PasswordHash = "AQAAAAEAACcQAAAAEA9qJ4ohNEvnyXAmcdi37w23gG7YGZ20hxjpPST58Mdr3Aj3peOdLSdbAUloBX+U/g==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEEBhPzSMqihnaStzjMVCSLX0QnVT0FmaA9JrE4/mmyl4g7x+HV+4h8aKhrhRMEXhBQ==",
                             PhoneNumber = "0399056507",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
@@ -168,6 +175,9 @@ namespace CRM_Management_Student.Backend.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Image")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("ModifiedDate")
                         .HasColumnType("datetime2");
 
@@ -183,6 +193,22 @@ namespace CRM_Management_Student.Backend.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Classes");
+                });
+
+            modelBuilder.Entity("CRM_Management_Student.Backend.Data.Entity.ClassSubject", b =>
+                {
+                    b.Property<Guid>("ClassId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("SubjectId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Score")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ClassId", "SubjectId");
+
+                    b.ToTable("SubjectClasses", (string)null);
                 });
 
             modelBuilder.Entity("CRM_Management_Student.Backend.Data.Entity.Notification", b =>
@@ -251,39 +277,11 @@ namespace CRM_Management_Student.Backend.Migrations
                     b.Property<Guid?>("ClassId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("AppUserId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("UserId", "ClassId");
-
-                    b.HasIndex("AppUserId");
 
                     b.HasIndex("ClassId");
 
                     b.ToTable("UserClasses", (string)null);
-                });
-
-            modelBuilder.Entity("CRM_Management_Student.Backend.Data.Entity.UserSubject", b =>
-                {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("SubjectId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("AppUserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Score")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("UserId", "SubjectId");
-
-                    b.HasIndex("AppUserId");
-
-                    b.HasIndex("SubjectId");
-
-                    b.ToTable("UserSubjects", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -389,38 +387,42 @@ namespace CRM_Management_Student.Backend.Migrations
                     b.Navigation("AppUser");
                 });
 
+            modelBuilder.Entity("CRM_Management_Student.Backend.Data.Entity.ClassSubject", b =>
+                {
+                    b.HasOne("CRM_Management_Student.Backend.Data.Entity.Class", "Class")
+                        .WithMany("SubjectClasses")
+                        .HasForeignKey("ClassId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CRM_Management_Student.Backend.Data.Entity.Subject", "Subject")
+                        .WithMany("SubjectClasses")
+                        .HasForeignKey("ClassId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Class");
+
+                    b.Navigation("Subject");
+                });
+
             modelBuilder.Entity("CRM_Management_Student.Backend.Data.Entity.UserClass", b =>
                 {
-                    b.HasOne("CRM_Management_Student.Backend.Data.Entity.AppUser", "AppUser")
-                        .WithMany("UserClasses")
-                        .HasForeignKey("AppUserId");
-
                     b.HasOne("CRM_Management_Student.Backend.Data.Entity.Class", "Class")
                         .WithMany("UserClasses")
                         .HasForeignKey("ClassId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("AppUser");
-
-                    b.Navigation("Class");
-                });
-
-            modelBuilder.Entity("CRM_Management_Student.Backend.Data.Entity.UserSubject", b =>
-                {
                     b.HasOne("CRM_Management_Student.Backend.Data.Entity.AppUser", "AppUser")
-                        .WithMany("UserSubjects")
-                        .HasForeignKey("AppUserId");
-
-                    b.HasOne("CRM_Management_Student.Backend.Data.Entity.Subject", "Subject")
-                        .WithMany("UserSubjects")
-                        .HasForeignKey("SubjectId")
+                        .WithMany("UserClasses")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("AppUser");
 
-                    b.Navigation("Subject");
+                    b.Navigation("Class");
                 });
 
             modelBuilder.Entity("CRM_Management_Student.Backend.Data.Entity.AppRole", b =>
@@ -433,18 +435,18 @@ namespace CRM_Management_Student.Backend.Migrations
                     b.Navigation("AppUserRoles");
 
                     b.Navigation("UserClasses");
-
-                    b.Navigation("UserSubjects");
                 });
 
             modelBuilder.Entity("CRM_Management_Student.Backend.Data.Entity.Class", b =>
                 {
+                    b.Navigation("SubjectClasses");
+
                     b.Navigation("UserClasses");
                 });
 
             modelBuilder.Entity("CRM_Management_Student.Backend.Data.Entity.Subject", b =>
                 {
-                    b.Navigation("UserSubjects");
+                    b.Navigation("SubjectClasses");
                 });
 #pragma warning restore 612, 618
         }

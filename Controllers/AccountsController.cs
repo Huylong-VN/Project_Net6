@@ -41,8 +41,8 @@ namespace CRM_Management_Student.Backend.Controllers
             return Ok(result);
         }
 
-        [HttpPut]
-        public async Task<IActionResult> UpdateAsync([FromForm] UpdateUserDto request, Guid Id)
+        [HttpPut("{Id}")]
+        public async Task<IActionResult> UpdateAsync(Guid Id,[FromForm] UpdateUserDto request)
         {
             var result = await _userService.UpdateAsync(Id, request);
             await _hubContext.Clients.All.SendAsync("listuser", result.ResultObj);
@@ -58,10 +58,10 @@ namespace CRM_Management_Student.Backend.Controllers
         }
 
 
-        [HttpPut("roles")]
-        public async Task<IActionResult> RoleAssign([FromBody] RoleAssignRequest request)
+        [HttpPut("roles/{Id}")]
+        public async Task<IActionResult> RoleAssign([FromBody] RoleAssignRequest request,Guid Id)
         {
-            ApiResult<bool>? result = await _userService.RoleAssign(request.Id, request);
+            ApiResult<bool>? result = await _userService.RoleAssign(Id, request);
             await _hubContext.Clients.All.SendAsync("listuser", result);
             return Ok(result);
         }
@@ -101,5 +101,6 @@ namespace CRM_Management_Student.Backend.Controllers
             }
             return Ok(result.Message);
         }
+       
     }
 }
